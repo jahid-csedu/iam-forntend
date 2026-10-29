@@ -1,0 +1,17 @@
+# Dependencies: rebuilt by "npm install"
+node_modules/
+
+# Build output: rebuilt by "npm run build"
+dist/
+
+# Local env files hold real values and must never be committed (README step 1)
+.env.local
+.env.*.local
+
+# Logs and OS noise
+*.log
+Thumbs.db
+.DS_Store
+
+# Throwaway practice app from lesson 0.1
+react-practice/

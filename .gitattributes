@@ -1,0 +1,2 @@
+# Let git detect text files, and always use LF line endings in the working folder
+* text=auto eol=lf
