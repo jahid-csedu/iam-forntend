@@ -7,7 +7,7 @@ authorization provider similar to Auth0.
 |---|---|
 | **Audience** | Frontend developers who have never seen the backend |
 | **Backend** | `iam-system` (Spring Boot, REST + JWT), sister folder of this one |
-| **Matches backend as of** | Step 11 (client status), the password-reset security fixes, CORS, `GET /api/me`, `PATCH /api/users/{id}`, `PATCH /api/me`, password-guess lockout, 401 reasons, `expires_in`, no self-deletion, environment profiles (2026-10-26), user deactivation and unlock (backend step 12), the email service with asynchronous sending and email verification (backend step 13), RFC 9457 error answers (2026-10-27); the backend plan is complete |
+| **Matches backend as of** | Step 11 (client status), the password-reset security fixes, CORS, `GET /api/me`, `PATCH /api/users/{id}`, `PATCH /api/me`, password-guess lockout, 401 reasons, `expires_in`, no self-deletion, environment profiles (2026-10-26), user deactivation and unlock (backend step 12), the email service with asynchronous sending and email verification (backend step 13), RFC 9457 error answers (2026-10-27), Actuator health and info (2026-10-31); the backend plan is complete |
 | **Owner of this document** | Product (update it with every backend step, see [section 9](#9-how-this-document-evolves)) |
 
 Read sections 1 to 4 once, front to back. After that, section 6 is the build plan: work through it in order, one numbered
@@ -2568,6 +2568,11 @@ the `X-Tenant-Id` tenant for platform users).
 
 Not product endpoints, used only by the team: `/swagger-ui.html` and `/v3/api-docs` (type generation, step 1).
 
+Not product endpoints, for operations only: Spring Boot Actuator under `/actuator` (public, read-only). Every
+environment has `/actuator/health` (overall status only; `/health/liveness` and `/health/readiness` for probes) and
+`/actuator/info` (build name and version); `dev` adds metrics and applied migrations, `local` more. The console doesn't
+use them; a status page could show `/actuator/health` (`200` up, `503` down).
+
 ---
 
 ## 8. Backend gaps and planned work
@@ -2708,3 +2713,4 @@ rule updates this document **in the same change** as the backend's `docs/USER_MA
 | 2026-10-27 | Backend plan step 14 (reset link) moved to the backend roadmap as item 2, together with verification links; later roadmap items renumbered (self-registration 3, own-account deletion 4, MFA 5, OAuth2/OIDC 6): step 27, G-14, G-21, G-24, section 8.2. |
 | 2026-10-27 | Backend plan step 15 (per-client allowed origins) moved to the backend roadmap as item 6; OAuth2/OIDC is now roadmap 7: step 29, G-3, G-26, section 4.1, section 8.2. The backend plan has no steps left. |
 | 2026-10-27 | Errors are RFC 9457 problems (`application/problem+json`, `detail` instead of `message`, every `401` included); "already exists" is `409`; invalid `page`/`size` lists `errors`: sections 3.7, 4.3, 5 (API client), the error tables of the signup, profile, user, role and application steps, G-4, 8.2. New backend roadmap item 2 (stable error codes, G-4); later roadmap items renumbered (self-registration 4, own-account deletion 5, MFA 6, allowed web origins 7, OAuth2/OIDC 8). The backend implementation plan is complete. |
+| 2026-10-31 | Spring Boot Actuator: public, read-only `/actuator/health` (with liveness/readiness probes) and `/actuator/info` in every environment, more in `local`/`dev`: noted under the API coverage matrix (section 7). No product API change. |
