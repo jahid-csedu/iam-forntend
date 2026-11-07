@@ -45,11 +45,15 @@ Then **stop and wait** for Jahid to type it, run it and report back. Don't pile 
 ## Teaching style
 
 - Go at a beginner's pace. One new idea at a time; don't introduce a library before the lesson that needs it.
+- **Keep replies short** (learned in 1.2). Jahid got lost in long replies with tables, several alternatives and many open
+  tasks. What works: plain words, one analogy (e.g. "props arrive as one box"), the six lesson steps kept brief, one
+  task or question at a time, side notes only when asked. Letting Jahid try a mistake on purpose (hooks outside a
+  component, `{0 && ...}`) worked well.
 - Prefer simple, readable code over clever code. Explain TypeScript types as they appear.
 - When the README's recommended approach is heavy for a beginner, say so, propose a simpler first version, and note
   how it becomes the README's version later.
-- When unsure about backend behaviour, point to Swagger UI (`http://localhost:8080/swagger-ui.html`) and README
-  section 7 rather than guessing.
+- When unsure about backend behaviour, point to Swagger UI (`http://localhost:8081/swagger-ui.html` on Jahid's machine)
+  and README section 7 rather than guessing.
 - Link official docs (react.dev, typescriptlang.org, vite.dev, mantine.dev, tanstack.com) for further reading.
 - Ask before moving to the next lesson.
 
@@ -65,10 +69,11 @@ when we start the second app (README step 24). This keeps the first weeks about 
 
 ## Environment
 
-- Windows 11, VS Code, Node 22.17, npm 11, git 2.45. pnpm is **not installed yet** (needed only for the monorepo stage).
-  Node installed with the official installer (`C:\Program Files\nodejs`). 2026-11-01: advised updating to Node 26 LTS
-  (26.13.0, bundled npm 11.20); not npm 12, not TypeScript 7 (typescript-eslint 8.72.1 supports TS `<6.1.0`). Node 25+
-  has no corepack: install pnpm with `npm install -g pnpm` in module 10. Node 26 runs `.ts` without the strip-types flag.
+- Windows 11, VS Code, **Node 26.13.0 LTS, npm 11.20.0** (bundled; updated 2026-11-01), git 2.45. pnpm is **not
+  installed yet** (needed only for the monorepo stage). Node installed with the official installer
+  (`C:\Program Files\nodejs`). Stay on npm bundled with Node (not npm 12) and on TypeScript 6 (typescript-eslint 8.72.1
+  supports TS `<6.1.0`; check `npm view typescript-eslint peerDependencies` before moving to TS 7). Node 25+ has no
+  corepack: install pnpm with `npm install -g pnpm` in module 10. Node 26 runs `.ts` without the strip-types flag.
 - The project folder (`IAM System UX`) is the git repo root, branch `main`. `react-practice/` is gitignored. Global git
   has `core.autocrlf=true`; the repo's `.gitattributes` forces `eol=lf`. Folder is inside OneDrive: if npm hits `EPERM`
   file locks, move the repo outside OneDrive (e.g. `C:\dev\`).
@@ -98,6 +103,22 @@ Each module lists the README steps it covers and the concepts taught along the w
 
 Testing is introduced as module 8 so the basics come first, but from module 4 on each lesson may add a small test.
 
+## Resume here (next session)
+
+Updated 2026-11-06. **Modules 0 and 1 are complete.** Next: **module 2, lesson 2.1: create the real console app.**
+
+- Start by greeting Jahid, saying modules 0-1 are done, and offering lesson 2.1. Ask before starting.
+- 2.1 plan: create the real Vite + React + TS app in the repo (not in `react-practice`). Suggested location
+  `apps/console/` so it already matches the README layout (step 1) and the monorepo move in module 10 is smaller; confirm
+  with Jahid. Check what `npm create vite@latest` pins (in 0.1 it pinned TS 7; keep TS `~6.0.x` while typescript-eslint
+  needs it). Make sure the repo's root `.gitignore` covers the new app's `node_modules/`, `dist/`, `.env.local`. Commit.
+- Then 2.2+: Mantine (install, `MantineProvider`, theme), then the app shell from README step 2 (header, side nav,
+  content area, toasts). Composition (`children`) has not been taught yet: introduce it with the shell.
+- `react-practice/` stays as a scratchpad (gitignored). Useful things already there: `src/getJson.ts` (generic fetch
+  helper), `src/types.ts` (User), components from module 1, `js-practice/` scripts.
+- Backend runs on port 8081 (see Environment); CORS already allows `http://localhost:5173`.
+- Small open items: Prettier + VS Code `files.eol` = `\n` (from 0.2) when linting/formatting is set up in the real app.
+
 ## Progress log
 
 Update after each finished lesson: date, lesson, what was built, open questions.
@@ -120,3 +141,4 @@ Update after each finished lesson: date, lesson, what was built, open questions.
 | 2026-11-03 | 1.4 Lists and keys | Done | `App` renders `users: User[]` with `users.map((user) => <WelcomeCard key={user.id} user={user} />)`. Learned: `map` to JSX, `key` as a unique name tag (not passed as a prop), id over name for keys. Next: 1.5 conditional rendering |
 | 2026-11-05 | 1.5 Conditional rendering | Done | `WelcomeCard`: ternary for "No roles yet." vs count, `user.userType === 'MANAGEMENT' && <button>Manage users</button>`. Learned: `? :` for this-or-that, `&&` for this-or-nothing. First thought `{0 && ...}` shows nothing; tried it, saw the `0`, learned `&&` returns its left side and React renders numbers (fix: `roleCount > 0 &&`). Next: 1.6 `useEffect` (last of module 1) |
 | 2026-11-05 | 1.6 `useEffect` | Done | `src/getJson.ts` (exported generic, base URL 8081), `BackendStatus` (state "checking..." → `useEffect(..., [])` with inner async `loadHealth`, `catch` → DOWN), shown in `AppHeader`. Backend CORS already allows `http://localhost:5173` (no proxy needed yet). Learned: effects run after render, `[]` = once, StrictMode double-run in dev, loading-state pattern. Tested backend stopped → DOWN; said it came from the `!ok` throw, corrected: `fetch` itself throws on network failure. **Module 1 complete.** Next: module 2, creating the real console app and the app shell (README step 2) |
+| 2026-11-07 | 1.6 follow-up: dependency array, where effects go | Done | Asked what the `[]` is: explained as a watch list (no array = every render, `[]` = once, `[x]` = when x changes) with a "try removing `[]`" exercise. Asked if every component needs `useEffect`: only components that reach outside React (fetch, timers, `document.title`); TanStack Query replaces most fetch effects later. Check question (`UserDetails` with `userId` prop → `[userId]`) not answered yet. Started 2.1 in `apps/console/` |
