@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router';
 import '@mantine/core/styles.css' // Mantine's CSS: without it, components are unstyled
 import '@mantine/notifications/styles.css' // Mantine's notifications CSS
 import { MantineProvider, createTheme } from '@mantine/core'
@@ -15,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <MantineProvider theme={theme}>
       <Notifications />
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </MantineProvider>
   </StrictMode>,
 )

@@ -1,36 +1,18 @@
-import { Button, Text } from '@mantine/core'
-import { notifications } from '@mantine/notifications'
+import { Route, Routes } from 'react-router'
 import AppLayout from './ui/AppLayout'
-import Page from './ui/Page'
+import DashboardPage from './pages/DashboardPage'
+import UsersPage from './pages/UsersPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
-  const showSaved = () => {
-    notifications.show({
-      title: 'Done',
-      message: 'Profile saved',
-      color: 'green',
-    })
-  }
-
-  const showEmailFailed = () => {
-    notifications.show({
-      title: 'Email Failed',
-      message: 'The email could not be sent. Nothing was changed. Try again later.',
-      color: 'red',
-    })
-  }
-
   return (
     <AppLayout>
-      <Page title="Dashboard">
-        <Text c="dimmed">Mantine is working.</Text>
-        <Button mt="md" onClick={showSaved}>
-          Save
-        </Button>
-        <Button mt="md" onClick={showEmailFailed}>
-          Send Email
-        </Button>
-      </Page>
+      {/* Only the matching Route is shown, inside the layout */}
+      <Routes>
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </AppLayout>
   )
 }
