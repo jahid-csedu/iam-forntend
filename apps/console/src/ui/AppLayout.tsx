@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link, Outlet, useLocation } from 'react-router'
 import { AppShell, NavLink, Text, Burger, Group } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 
@@ -18,11 +17,7 @@ const navItems: NavItem[] = [
     { label: 'Developer guide', path: '/developers' },
 ]
 
-interface AppLayoutProps {
-    children: ReactNode
-}
-
-function AppLayout({ children }: AppLayoutProps) {
+function AppLayout() {
     const [opened, { toggle, close }] = useDisclosure(false)
     const location = useLocation()
 
@@ -64,7 +59,9 @@ function AppLayout({ children }: AppLayoutProps) {
                 ))}
             </AppShell.Navbar>
 
-            <AppShell.Main>{children}</AppShell.Main>
+            <AppShell.Main>
+                <Outlet />
+            </AppShell.Main>
         </AppShell>
     )
 }
