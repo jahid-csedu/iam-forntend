@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage'
 import NotFoundPage from './pages/NotFoundPage'
 import LoginPage from './pages/LoginPage'
+import UserDetailPage from './pages/UserDetailPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/users/:id" element={<UserDetailPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
