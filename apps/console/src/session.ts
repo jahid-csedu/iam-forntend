@@ -1,1 +1,1 @@
-export const isLoggedIn: boolean = true
+export const isLoggedIn: boolean = false

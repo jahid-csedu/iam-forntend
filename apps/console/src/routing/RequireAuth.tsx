@@ -1,9 +1,12 @@
-import { Navigate, Outlet } from 'react-router'
+import { Navigate, Outlet, useLocation } from 'react-router'
 import { isLoggedIn } from '../session'
 
 function RequireAuth() {
+    const location = useLocation()
+
     if(!isLoggedIn) {
-        return <Navigate to="/login" replace />
+        const wanted = location.pathname + location.search
+        return <Navigate to={`/login?returnTo=${encodeURIComponent(wanted)}`} replace />
     }
 
     return <Outlet />

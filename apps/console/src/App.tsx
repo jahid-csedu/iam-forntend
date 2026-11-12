@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router'
 import RequireAuth from './routing/RequireAuth'
+import RequireAnonymous from './routing/RequireAnonymous'
 import AppLayout from './ui/AppLayout'
 import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage'
@@ -11,7 +12,9 @@ function App() {
   return (
     <Routes>
       {/* No frame */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route element={<RequireAnonymous />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* Guard first, then the frame, then the pages */}
