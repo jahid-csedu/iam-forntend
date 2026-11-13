@@ -6,7 +6,7 @@ function RequireAnonymous() {
         return <Outlet />
     }
 
-    return <Navigate to="/dashboard" />
+    return <Navigate to="/dashboard" replace />
 }
 
 export default RequireAnonymous

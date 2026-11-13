@@ -105,29 +105,32 @@ Testing is introduced as module 8 so the basics come first, but from module 4 on
 
 ## Resume here (next session)
 
-Updated 2026-11-12. **Modules 0, 1 and 2 are complete; module 3 in progress: 3.1-3.4 done (3.4 committed `56bd152`),
-3.5 `useParams` started.** Since 3.3: `AppLayout` is a pathless layout route rendering `<Outlet />`, `/login`
-placeholder sits outside it, `*` inside it; `Page` renders a React 19 `<title>` ("X - IAM Console"). The paragraph below
-is from before 3.3, kept for the file list.
-`apps/console/` has Mantine 9.8.0 (core, hooks, notifications; keep all Mantine packages on the exact same version),
-teal theme, `src/ui/Page.tsx`, `src/ui/AppLayout.tsx` (AppShell + burger, `navItems: NavItem[]` rendered as Mantine
-`NavLink component={Link}`, active via `useLocation`), `<Notifications />` and `<BrowserRouter>` in `main.tsx`,
-React Router 8.5.1 (declarative mode), `src/pages/` (Dashboard with toast demo, Users, NotFound), routes `/dashboard`,
-`/users`, `*` in `App.tsx`. Next: **lesson 3.3: layout route with `Outlet`** (plus a placeholder `/login` outside the
-layout), then page title per route (README step 2), `useParams` for `/users/:id`, `useNavigate`, and guards with the
-`/` redirect. The older 2.1 notes below are kept for reference.
+Updated 2026-11-13. **Modules 0-3 are complete** (3.8 committed `f4e8324`). **Module 4 (API client) started: lesson 4.1,
+environment variables.**
 
-- Start by greeting Jahid, saying where module 3 stands, and offering the next lesson. Ask before starting.
-- 2.1 plan: create the real Vite + React + TS app in the repo (not in `react-practice`). Suggested location
-  `apps/console/` so it already matches the README layout (step 1) and the monorepo move in module 10 is smaller; confirm
-  with Jahid. Check what `npm create vite@latest` pins (in 0.1 it pinned TS 7; keep TS `~6.0.x` while typescript-eslint
-  needs it). Make sure the repo's root `.gitignore` covers the new app's `node_modules/`, `dist/`, `.env.local`. Commit.
-- Then 2.2+: Mantine (install, `MantineProvider`, theme), then the app shell from README step 2 (header, side nav,
-  content area, toasts). Composition (`children`) has not been taught yet: introduce it with the shell.
-- `react-practice/` stays as a scratchpad (gitignored). Useful things already there: `src/getJson.ts` (generic fetch
-  helper), `src/types.ts` (User), components from module 1, `js-practice/` scripts.
+- Start by greeting Jahid, saying where module 4 stands, and offering the next lesson. Ask before starting.
+- `apps/console/` today: Mantine 9.8.0 (core, hooks, notifications; keep all Mantine packages on the exact same
+  version), teal theme; React Router 8.5.1 (declarative mode, import from `'react-router'`); `main.tsx` has
+  `MantineProvider` > `Notifications` + `BrowserRouter` > `App`.
+- `src/App.tsx` routes: `RequireAnonymous` > `/login`; `/` → `Navigate` to `/dashboard`; `RequireAuth` > `AppLayout`
+  (pathless layout route, `<Outlet />`) > `/dashboard`, `/users`, `/users/:id`, `*`.
+- `src/ui/`: `Page` (title + React 19 `<title>` "X - IAM Console"), `AppLayout` (AppShell, burger, `navItems: NavItem[]`
+  as Mantine `NavLink component={Link}`, active via `useLocation().pathname.startsWith`). `src/pages/`: Dashboard (toast
+  demo), Users (two `Anchor` links), UserDetail (`useParams`, fake Delete → toast + `navigate('/users')`), NotFound,
+  Login (shows `safeReturnTo(searchParams.get('returnTo'))`). `src/routing/`: `RequireAuth` (adds `?returnTo=`),
+  `RequireAnonymous`, `returnTo.ts`. `src/session.ts`: pretend `isLoggedIn: boolean` (to be replaced in module 4).
+- Open small items: `RequireAnonymous` `Navigate` still lacks `replace`; `NotFoundPage` variable `nagivate` typo;
+  `UsersPage` Anchors have needless `key`s and no `Stack`; `@types/node` is `^24` (suggest 26); Prettier + VS Code
+  `files.eol` = `\n` not set up yet.
+- Module 4 plan (simpler first versions of README step 4, one idea per lesson): 4.1 env variables (`.env.local`,
+  `import.meta.env`, typed in `src/env.d.ts`, `src/iam-client/config.ts`); 4.2 `request<T>()` helper (base URL, JSON,
+  health check as first call); 4.3 `ApiError` (README 4.3, `detail`, `errors[]` → `fieldErrors`, default message per
+  status, network failure); 4.4 session store in localStorage (refresh token) + memory (access token); 4.5 React
+  Context to replace `isLoggedIn`; token decoding. Refresh single-flight, Web Locks, BroadcastChannel, `X-Tenant-Id`
+  come in modules 6 and 9.
+- `react-practice/` stays as a scratchpad (gitignored): `src/getJson.ts` (generic fetch helper from 1.6) is the
+  ancestor of `request()`.
 - Backend runs on port 8081 (see Environment); CORS already allows `http://localhost:5173`.
-- Small open items: Prettier + VS Code `files.eol` = `\n` (from 0.2) when linting/formatting is set up in the real app.
 
 ## Progress log
 
@@ -165,4 +168,5 @@ Update after each finished lesson: date, lesson, what was built, open questions.
 | 2026-11-12 | 3.5 `useParams` and `/users/:id` | Done (not committed yet) | 3.4 committed as `56bd152`. `UserDetailPage` reads `const { id } = useParams()` (string \| undefined; params are strings; like Spring `@PathVariable`), title `User ${id}`; route `/users/:id` inside the layout. Exercise done alone: two `Anchor component={Link}` links on `UsersPage`. Notes given: `key` only needed on items from `map` (his Anchors had `key="user-1"`), Anchors are inline so they run together ("User 1User 2"): wrap in `Stack`/`Group`. Check answered correctly: `/users/new` will show create user (static segments beat `:id`, order doesn't matter). Build and lint pass. Next: 3.6 `useNavigate` (navigate from code, e.g. a button) then guards + `/` redirect |
 | 2026-11-12 | 3.6 `useNavigate` | Done (not committed yet) | 3.5 committed as `efde275`. `UserDetailPage`: fake Delete button → `notifications.show('User deleted')` + `navigate('/users')` (README step 13 204 row). Exercise done alone: `NotFoundPage` "Go to Dashboard" button with `navigate`; variable typo `nagivate` (works because consistent; TS can't catch it, suggested F2 rename). Check answered correctly: a `Link` would also work there because it's a fixed destination with no action first. Asked NavLink vs Anchor: both Mantine, both `<a>` + `component={Link}`; NavLink = menu row (label, active, nested), Anchor = inline text link; React Router's own `NavLink` is a different thing. Build and lint pass. Next: 3.7 route guard, simple first version (fake `isLoggedIn`, `<Navigate>`, `/` redirect), real session in module 4/6 |
 | 2026-11-12 | 3.7 Route guard (simple) | Done (not committed yet) | 3.6 committed as `c5c8dd4`. `src/session.ts` (`export const isLoggedIn: boolean`, pretend switch, currently `true`), `src/routing/RequireAuth.tsx` (`<Navigate to="/login" replace />` or `<Outlet />`), `App.tsx`: `/` → `<Navigate to="/dashboard" replace />`, guard route wrapping the layout route ("security desk, then frame"). Learned: `<Navigate>` (redirect during render) vs `navigate()` (in handlers), `replace` (Back-button trap), nested pathless routes. Check partly right ("convenient, guard for the full route"); added: one place so new pages can't be forgotten; per-route rules (README permission guards) also become guard routes, not `if`s in pages. Back-button experiment result not reported. Build and lint pass. Not yet: anonymous-only guard, `returnTo`, permission guard, Not found for anonymous users. Next: 3.8 anonymous-only guard + `returnTo` |
-| 2026-11-12 | 3.8 `returnTo` and anonymous-only guard | Done (not committed yet) | 3.7 committed as `457d1f7`. `src/routing/returnTo.ts` (`safeReturnTo`: must start with `/`, not `//` or `/\`, else `/dashboard`), `RequireAuth` adds `?returnTo=${encodeURIComponent(pathname + search)}` (`useLocation` before the early return), `LoginPage` reads it with `useSearchParams` and shows it. Learned: query string (like `@RequestParam`), `encodeURIComponent`, open redirect. Check Q2 correct (`//evil.com` blocked by the `!startsWith('//')` line). Exercise `RequireAnonymous`: first attempt had only the `<Outlet />` branch, lowercase name, no export; after the "two doors" table explanation finished it and wrapped `/login`. Remaining: its `Navigate` lacks `replace` (hinted). Build and lint pass. README step 3: `returnTo` relative-only met; actual return after login comes with the login form (module 5); permission guard and `/login/:clientId` with the session (modules 4-6). Next: module 4 (API client), or a 3.x wrap-up if Jahid wants |
+| 2026-11-12 | 3.8 `returnTo` and anonymous-only guard | Done (not committed yet) | 3.7 committed as `457d1f7`. `src/routing/returnTo.ts` (`safeReturnTo`: must start with `/`, not `//` or `/\`, else `/dashboard`), `RequireAuth` adds `?returnTo=${encodeURIComponent(pathname + search)}` (`useLocation` before the early return), `LoginPage` reads it with `useSearchParams` and shows it. Learned: query string (like `@RequestParam`), `encodeURIComponent`, open redirect. Check Q2 correct (`//evil.com` blocked by the `!startsWith('//')` line). Exercise `RequireAnonymous`: first attempt had only the `<Outlet />` branch, lowercase name, no export; after the "two doors" table explanation finished it and wrapped `/login`. Remaining: its `Navigate` lacks `replace` (hinted). Build and lint pass. README step 3: `returnTo` relative-only met; actual return after login comes with the login form (module 5); permission guard and `/login/:clientId` with the session (modules 4-6). Committed as `f4e8324` (without the `replace` fix). **Module 3 complete** for now (permission guard, `/login/:clientId`, Not found for anonymous users wait for the session). Next: module 4, 4.1 env variables |
+| 2026-11-13 | 4.1 Environment variables | Done (not committed yet) | `apps/console/.env.local` (`VITE_IAM_API_BASE_URL=http://localhost:8081`, gitignored), `.env.example` (8080, committed), `src/env.d.ts` (`ImportMetaEnv` + `ViteTypeOptions { strictImportMetaEnv: unknown }`), `src/iam-client/config.ts` (`apiBaseUrl`), Dashboard shows it. Learned: `VITE_` prefix, restart dev server after editing `.env`, values are public in the bundle. Check exposed a lesson mistake: without `strictImportMetaEnv` Vite allows any key as `any`, so the typo showed nothing; after adding it the typo is an error. Asked why three files: explained value (`.env.local`, per machine) vs typed description (`env.d.ts`, like a Spring `@ConfigurationProperties` class) vs single reader (`config.ts`). Also added `replace` to `RequireAnonymous`. Build and lint pass. Next: 4.2 `request<T>()` helper |
