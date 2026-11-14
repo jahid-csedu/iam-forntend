@@ -14,6 +14,7 @@ function BackendStatus() {
                 setStatus("DOWN")
             }
         }
+
         loadHealth()
     }, [])
 
