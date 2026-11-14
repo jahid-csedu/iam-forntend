@@ -16,14 +16,10 @@ function DashboardPage() {
 
     const testError = async () => {
         try {
-            await request('GET', '/api/me')
+            await request('POST', '/api/tenants/signup', { body: {} })
         } catch (error) {
             if (error instanceof ApiError) {
-                notifications.show({
-                    color: 'red', 
-                    title: `Error ${error.status}`, 
-                    message: error.message
-                })
+                console.log(error.fieldErrors)
             }
         }
     }
