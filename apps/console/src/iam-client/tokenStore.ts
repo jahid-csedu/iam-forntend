@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'iam:session'
+const STORAGE_KEY = 'iam.session'
 
 interface StoredSession {
     refreshToken: string,
