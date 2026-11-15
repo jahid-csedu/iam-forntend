@@ -6,6 +6,7 @@ import '@mantine/notifications/styles.css' // Mantine's notifications CSS
 import { MantineProvider, createTheme } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 import App from './App.tsx'
+import SessionProvider from './session/SessionProvider.tsx';
 
 // One place for app-wide style settings
 const theme = createTheme({
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')!).render(
     <MantineProvider theme={theme}>
       <Notifications />
       <BrowserRouter>
-        <App />
+        <SessionProvider>
+          <App />
+        </SessionProvider>
       </BrowserRouter>
     </MantineProvider>
   </StrictMode>,

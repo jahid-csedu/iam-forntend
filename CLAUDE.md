@@ -105,31 +105,37 @@ Testing is introduced as module 8 so the basics come first, but from module 4 on
 
 ## Resume here (next session)
 
-Updated 2026-11-13. **Modules 0-3 are complete** (3.8 committed `f4e8324`). **Module 4 (API client): 4.1-4.5 done (request, ApiError with fieldErrors, tokenStore), 4.6 `Authorization` header in progress, then 4.7 React Context replacing `isLoggedIn`.** Keep lessons small: Jahid lost confidence in 4.2 when one lesson had two files plus an exercise.
+Updated 2026-11-15. **Modules 0-4 are complete** (4.7 React Context is the last; commit pending at time of writing).
+Next: **module 5, first forms**: suggested order 5.1 login form for real (README step 6: `POST /api/auth/authenticate`,
+replaces the Fake login button, uses `returnTo`), introducing React Hook Form + Zod one at a time, then signup (step 5)
+and forgot password (step 7). Check README step 6 for the exact body (`client_id`, username, password) and the
+`/login/:clientId` routes first.
 
-- Start by greeting Jahid, saying where module 4 stands, and offering the next lesson. Ask before starting.
-- `apps/console/` today: Mantine 9.8.0 (core, hooks, notifications; keep all Mantine packages on the exact same
-  version), teal theme; React Router 8.5.1 (declarative mode, import from `'react-router'`); `main.tsx` has
-  `MantineProvider` > `Notifications` + `BrowserRouter` > `App`.
-- `src/App.tsx` routes: `RequireAnonymous` > `/login`; `/` → `Navigate` to `/dashboard`; `RequireAuth` > `AppLayout`
-  (pathless layout route, `<Outlet />`) > `/dashboard`, `/users`, `/users/:id`, `*`.
-- `src/ui/`: `Page` (title + React 19 `<title>` "X - IAM Console"), `AppLayout` (AppShell, burger, `navItems: NavItem[]`
-  as Mantine `NavLink component={Link}`, active via `useLocation().pathname.startsWith`). `src/pages/`: Dashboard (toast
-  demo), Users (two `Anchor` links), UserDetail (`useParams`, fake Delete → toast + `navigate('/users')`), NotFound,
-  Login (shows `safeReturnTo(searchParams.get('returnTo'))`). `src/routing/`: `RequireAuth` (adds `?returnTo=`),
-  `RequireAnonymous`, `returnTo.ts`. `src/session.ts`: pretend `isLoggedIn: boolean` (to be replaced in module 4).
-- Open small items: `RequireAnonymous` `Navigate` still lacks `replace`; `NotFoundPage` variable `nagivate` typo;
-  `UsersPage` Anchors have needless `key`s and no `Stack`; `@types/node` is `^24` (suggest 26); Prettier + VS Code
-  `files.eol` = `\n` not set up yet.
-- Module 4 plan (simpler first versions of README step 4, one idea per lesson): 4.1 env variables (`.env.local`,
-  `import.meta.env`, typed in `src/env.d.ts`, `src/iam-client/config.ts`); 4.2 `request<T>()` helper (base URL, JSON,
-  health check as first call); 4.3 `ApiError` (README 4.3, `detail`, `errors[]` → `fieldErrors`, default message per
-  status, network failure); 4.4 session store in localStorage (refresh token) + memory (access token); 4.5 React
-  Context to replace `isLoggedIn`; token decoding. Refresh single-flight, Web Locks, BroadcastChannel, `X-Tenant-Id`
-  come in modules 6 and 9.
-- `react-practice/` stays as a scratchpad (gitignored): `src/getJson.ts` (generic fetch helper from 1.6) is the
-  ancestor of `request()`.
-- Backend runs on port 8081 (see Environment); CORS already allows `http://localhost:5173`.
+- Start by greeting Jahid, saying where things stand, and offering the next lesson. Ask before starting.
+- **Keep lessons small** (one new file or one change plus one check). Jahid lost confidence in 4.2 when a lesson had two
+  files plus an exercise; walking the code path step by step ("the trip") restored it.
+- Watch for: forgetting destructuring braces (`const x = useSession()`), leftover old code/comments after refactors,
+  unused imports that only `npm run build` catches (remind to run build, not just the dev server).
+- `apps/console/` today: Mantine 9.8.0 (core, hooks, notifications; same exact version for all), teal theme; React
+  Router 8.5.1 (declarative, import from `'react-router'`); `main.tsx`: `MantineProvider` > `Notifications` +
+  `BrowserRouter` > `SessionProvider` > `App`.
+- Routes (`App.tsx`): `RequireAnonymous` > `/login`; `/` → `/dashboard`; `RequireAuth` > `AppLayout` > `/dashboard`,
+  `/users`, `/users/:id`, `*`. Guards read `const { isLoggedIn } = useSession()`.
+- `src/iam-client/`: `config.ts` (`apiBaseUrl` from `VITE_IAM_API_BASE_URL`, typed strictly in `src/env.d.ts`),
+  `request.ts` (`request<T>(method, path, { body, auth })`, JSON, Bearer token unless `auth: false`, 204 → undefined,
+  network failure → `ApiError(0, ...)`, `readProblem` → title/detail/`errors[]`), `ApiError.ts` (`status`, `title`,
+  `message`, `fieldErrors`), `health.ts` (`getHealth`, public), `tokenStore.ts` (access token in memory, `iam.session`
+  in localStorage = `{ refreshToken, clientId }`). `src/session/`: `SessionContext.ts` (`Session`, `useSession`),
+  `SessionProvider.tsx` (`isLoggedIn` state from `getAccessToken() !== null`, `login`, `logout`).
+- Pages: Dashboard (BackendStatus, Save toast, Test error on `GET /api/me`, Show session, Logout), Login (returnTo text,
+  Fake login), Users, UserDetail, NotFound. `src/ui/`: `Page`, `AppLayout`, `BackendStatus`. `src/routing/`: guards,
+  `returnTo.ts`.
+- Not done yet from README step 4: refresh on 401 (single-flight, Web Locks, BroadcastChannel), proactive refresh,
+  `X-Tenant-Id`, token decoding, per-client storage key: modules 6 and 9.
+- Open small items: `NotFoundPage` `nagivate` typo; `UsersPage` needless `key`s and no `Stack`; `ApiError` constructor
+  has two strings side by side; `@types/node` `^24`; Prettier + VS Code `files.eol` not set up.
+- Backend on port 8081 (see Environment); CORS allows `http://localhost:5173`. It is often not running when lessons
+  start: remind Jahid to start it before "Try it".
 
 ## Progress log
 
@@ -175,3 +181,4 @@ Update after each finished lesson: date, lesson, what was built, open questions.
 | 2026-11-14 | 4.4 `fieldErrors` | Done (not committed yet) | 4.3 committed as `2aacb08`. `ApiError` has `fieldErrors: Record<string,string>` (default `{}`), `readProblem` maps `errors[]` with `for...of` + `Array.isArray`; test: empty `POST /api/tenants/signup` → 422 and fieldErrors in console. Check: answered `{}` for a 404 correctly (the "why easier than undefined" half not answered). Bug: kept old `readDetail` and still calls it after `readProblem` (`request.ts:40`), so the body is read twice; the second `response.json()` fails and the message falls back to "Reqeust failed with status 422". Hinted (body can be read only once); also stale comment line 39. Fixed: uses `problem.message`, `readDetail` deleted (stale comment still on line 39). Asked what `errors?: { field: string; message: string }[]` means: explained inline object type, `[]` = list of them, `?` = may be missing, same as a named `interface FieldError` + `FieldError[]`. Build and lint pass. Next: 4.5 session store (tokens in memory + localStorage) |
 | 2026-11-14 | 4.5 Token store | Done (not committed yet) | 4.4 committed as `b429a1e`. `src/iam-client/tokenStore.ts`: `accessToken` module variable (memory), `localStorage` key (he used `iam:session`; README says `iam.session.<client_id>`, told to use a dot) with JSON `{ refreshToken, clientId }`, `saveSession`/`getAccessToken`/`getStoredSession`/`clearSession`; temporary Fake login / Show session (+ clear) buttons on Dashboard. Learned: memory vs `localStorage` (strings only, `JSON.stringify`/`parse`, readable by any script → keep the access token out), "day pass vs membership card". Check: saw access token `null` after reload; explained the refresh token stays so module 6 can get a new access token without logging in again. Build and lint pass. Next: 4.6 send the access token (`Authorization: Bearer`) from `request()`, then 4.7 React Context replacing `isLoggedIn` |
 | 2026-11-15 | 4.6 `Authorization: Bearer` header | Done (not committed yet) | 4.5 committed as `2bfff2d`. `request()` has `auth?: boolean` (default on), adds `Bearer ${getAccessToken()}` when a token exists; `getHealth` uses `auth: false`; storage key fixed to `iam.session`. Own initiative: added `title` to `Problem`/`ApiError` (from the problem JSON, default 'Error', 'Connection Error' for status 0) and shows it as the toast title. Notes given: test calls `POST /api/me` with a body, but `/api/me` is GET (lesson said GET); `ApiError(status, title, message, ...)` has two strings side by side, which TS can't catch if swapped; stale "lesson 4.3" comment still at `request.ts:49`. Then reported the header "disappeared again": code was fine (test now `GET /api/me`); cause was the memory-only access token being wiped by a reload, including Vite's automatic full reload after saving a non-component file like `request.ts`. Explained this is the 4.5 behaviour and the check answer; diagnose with Show session (access null, refresh still there); module 6 refresh will restore it automatically. Build and lint pass. Next: 4.7 React Context replacing `isLoggedIn` |
+| 2026-11-15 | 4.7 React Context (`SessionContext`, `useSession`, `SessionProvider`) | Done (not committed yet) | 4.6 committed as `0a4b425`. Typed `SessionContext.ts`, `SessionProvider.tsx` (React 19 `<SessionContext value>`), provider in `main.tsx` inside `BrowserRouter`, LoginPage Fake login button, deleted `src/session.ts`. Reported "login page is not loaded": both guards wrote `const isLoggedIn = useSession()` without braces, so `isLoggedIn` is the whole session object (always truthy) → `RequireAnonymous` always redirects `/login` to `/dashboard`; TS can't catch it because `!object` is valid. Hinted: compare with lesson's `const { isLoggedIn }`, hover to see the type (destructuring, 0.3b). Also `DashboardPage` has unused `saveSession` import and unused `login`. Fixed both guards to `const { isLoggedIn }`; login page works. Build failed on two unused names in `DashboardPage` (dev server runs anyway: Vite only strips types, `npm run build` runs `tsc`); removed them. Check answered correctly: `RequireAnonymous` redirected because `isLoggedIn` state changed and it re-rendered. Build and lint pass. **Module 4 done (simple versions)**; token decoding moved to when it is needed (step 8 / module 6). Next: module 5, real login form |

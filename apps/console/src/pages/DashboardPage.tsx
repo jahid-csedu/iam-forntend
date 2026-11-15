@@ -4,9 +4,11 @@ import { request } from '../iam-client/request'
 import BackendStatus from '../ui/BackendStatus'
 import Page from '../ui/Page'
 import { ApiError } from '../iam-client/ApiError'
-import { clearSession, getAccessToken, getStoredSession, saveSession } from '../iam-client/tokenStore'
+import { getAccessToken, getStoredSession } from '../iam-client/tokenStore'
+import { useSession } from '../session/SessionContext'
 
 function DashboardPage() {
+    const { logout } = useSession()
     const showSaved = () => {
         notifications.show({
             title: 'Done',
@@ -37,9 +39,8 @@ function DashboardPage() {
             <Group mt="md">
                 <Button onClick={showSaved}>Save</Button>
                 <Button color="red" onClick={testError}>Test error</Button>
-                <Button onClick={() => saveSession('fake-access', 'fake-refresh', 'console-1')}>Fake login</Button>
                 <Button onClick={() => console.log(getAccessToken(), getStoredSession())}>Show Session</Button>
-                <Button onClick={() => clearSession()}>Logout</Button>
+                <Button onClick={logout}>Logout</Button>
             </Group>
         </Page>
     )

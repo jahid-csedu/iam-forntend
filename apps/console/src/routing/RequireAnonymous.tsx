@@ -1,7 +1,8 @@
 import { Outlet, Navigate } from "react-router";
-import { isLoggedIn } from "../session";
+import { useSession } from "../session/SessionContext";
 
 function RequireAnonymous() {
+    const { isLoggedIn } = useSession()
     if (!isLoggedIn) {
         return <Outlet />
     }
