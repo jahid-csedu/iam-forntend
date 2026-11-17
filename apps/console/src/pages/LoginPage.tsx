@@ -1,18 +1,32 @@
 import { Button, Container, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core'
-import { useSearchParams } from 'react-router'
+import { useSearchParams, useNavigate } from 'react-router'
 import { safeReturnTo } from '../routing/returnTo'
 import { useState, type SubmitEvent } from 'react'
+import { notifications } from '@mantine/notifications'
+import { authenticate } from '../iam-client/auth'
+import { ApiError } from '../iam-client/ApiError'
+import { useSession } from '../session/SessionContext'
 
 function LoginPage() {
+    const { login } = useSession()
+    const navigate = useNavigate()
     const [clientId, setClientId] = useState('')
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [searchParams] = useSearchParams()
     const returnTo = safeReturnTo(searchParams.get('returnTo'))
 
-    const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
         event.preventDefault()
-        console.log({ clientId, username, password })
+        try {
+            const tokens = await authenticate(clientId, username, password)
+            login(tokens.access_token, tokens.refresh_token ?? '', clientId)
+            navigate(returnTo, {replace: true})
+        } catch (error) {
+            if (error instanceof ApiError) {
+                notifications.show({color: "red", title: error.title, message: error.message})
+            }
+        }
     }
 
     return (
