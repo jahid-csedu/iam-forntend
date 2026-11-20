@@ -6,6 +6,8 @@ import { authenticate } from '../iam-client/auth'
 import { ApiError } from '../iam-client/ApiError'
 import { useSession } from '../session/SessionContext'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 function loginErrorMessage(error: ApiError): string {
     if (error.message === 'Bad credentials') {
@@ -32,17 +34,19 @@ function loginErrorMessage(error: ApiError): string {
     return error.message
 }
 
-// The form's fields, like a DTO
-interface LoginFormValues {
-    clientId: string
-    username: string
-    password: string
-}
+// README step 6: all three required, no password policy at login
+const loginSchema = z.object({
+    clientId: z.string().min(1, 'Console ID is required'),
+    username: z.string().min(1, 'Username is required'),
+    password: z.string().min(1, 'Password is required'),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema> // same shape as the old interface
 
 function LoginPage() {
     const { login } = useSession()
     const navigate = useNavigate()
-    const { register, handleSubmit, formState: { isSubmitting } } = useForm<LoginFormValues>()
+    const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
     const [searchParams] = useSearchParams()
     const returnTo = safeReturnTo(searchParams.get('returnTo'))
 
@@ -69,9 +73,18 @@ function LoginPage() {
             <Text mt="md">After login you will go to: {returnTo}</Text>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack mt="md">
-                    <TextInput label="Console ID" {...register('clientId')} required />
-                    <TextInput label="Username" {...register('username')} required />
-                    <PasswordInput label="Password" {...register('password')} required />
+                    <TextInput label="Console ID"
+                        {...register('clientId')}
+                        withAsterisk
+                        error={errors.clientId?.message} />
+                    <TextInput label="Username"
+                        {...register('username')}
+                        withAsterisk
+                        error={errors.username?.message} />
+                    <PasswordInput label="Password"
+                        {...register('password')}
+                        withAsterisk
+                        error={errors.password?.message} />
                     {errorMessage && (
                         <Alert color="red" variant="light">
                             {errorMessage}
