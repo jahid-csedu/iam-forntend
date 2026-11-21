@@ -14,6 +14,7 @@ function App() {
       {/* No frame */}
       <Route element={<RequireAnonymous />}>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/:clientId" element={<LoginPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

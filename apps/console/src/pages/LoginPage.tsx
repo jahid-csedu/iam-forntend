@@ -1,5 +1,5 @@
-import { Alert, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core'
-import { useSearchParams, useNavigate } from 'react-router'
+import { Alert, Anchor, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from '@mantine/core'
+import { Link, useParams, useSearchParams, useNavigate } from 'react-router'
 import { safeReturnTo } from '../routing/returnTo'
 import { useState } from 'react'
 import { authenticate } from '../iam-client/auth'
@@ -44,9 +44,14 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema> // same shape as the old interface
 
 function LoginPage() {
+    // On /login/abc123 this is 'abc123'; on /login it's undefined
+    const { clientId: clientIdFromUrl } = useParams()
     const { login } = useSession()
     const navigate = useNavigate()
-    const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) })
+    const { register, handleSubmit, formState: { isSubmitting, errors } } = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: { clientId: clientIdFromUrl ?? '' }
+    })
     const [searchParams] = useSearchParams()
     const returnTo = safeReturnTo(searchParams.get('returnTo'))
 
@@ -73,10 +78,21 @@ function LoginPage() {
             <Text mt="md">After login you will go to: {returnTo}</Text>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Stack mt="md">
-                    <TextInput label="Console ID"
-                        {...register('clientId')}
-                        withAsterisk
-                        error={errors.clientId?.message} />
+                    {clientIdFromUrl ? (
+                        <Text size="sm">
+                            Console {clientIdFromUrl.slice(0, 6)}...{' '}
+                            <Anchor component={Link} to="/login">
+                                Not yours? Use another console
+                            </Anchor>
+                        </Text>
+                    ) : (
+                        <TextInput
+                            label="Console ID"
+                            withAsterisk
+                            error={errors.clientId?.message}
+                            {...register('clientId')}
+                        />
+                    )}
                     <TextInput label="Username"
                         {...register('username')}
                         withAsterisk
