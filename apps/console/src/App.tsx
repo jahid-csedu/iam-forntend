@@ -7,6 +7,7 @@ import UsersPage from './pages/UsersPage'
 import NotFoundPage from './pages/NotFoundPage'
 import LoginPage from './pages/LoginPage'
 import UserDetailPage from './pages/UserDetailPage'
+import SignupPage from './pages/SignupPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route element={<RequireAnonymous />}>
         <Route path="/login" element={<LoginPage key="login" />} />
         <Route path="/login/:clientId" element={<LoginPage key="login-with-id" />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

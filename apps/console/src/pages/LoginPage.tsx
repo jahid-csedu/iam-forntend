@@ -107,6 +107,12 @@ function LoginPage() {
                         </Alert>
                     )}
                     <Button type="submit" loading={isSubmitting}>Log in</Button>
+                    <Text size="sm">
+                        New here? {' '}
+                        <Anchor component={Link} to="/signup">
+                            Create an organization
+                        </Anchor>
+                    </Text>
                 </Stack>
             </form>
         </Container>
