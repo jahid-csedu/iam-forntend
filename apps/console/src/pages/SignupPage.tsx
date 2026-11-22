@@ -1,9 +1,10 @@
 import { Anchor, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
 import { Link } from "react-router";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PASSWORD_POLICY, PASSWORD_POLICY_MESSAGE } from "../iam-client/passwordPolicy";
+import PasswordChecklist from '../ui/PasswordChecklist'
 
 const signupSchema = z.object({
     tenantName: z.string().trim().min(1, 'Organization name is required'),
@@ -24,8 +25,11 @@ function SignupPage() {
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors }
     } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema) })
+
+    const password = useWatch({ control, name: 'password'}) ?? '' // empty before the first keystroke
 
     const onSubmit = (values: SignupFormValues) => {
         console.log(values)
@@ -65,6 +69,7 @@ function SignupPage() {
                         error={errors.password?.message}
                         {...register('password')}
                     />
+                    <PasswordChecklist password={password} />
                     <PasswordInput
                         label="Confirm password"
                         withAsterisk
