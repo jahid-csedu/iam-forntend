@@ -1,10 +1,14 @@
-import { Anchor, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Alert, Anchor, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
 import { Link } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PASSWORD_POLICY, PASSWORD_POLICY_MESSAGE } from "../iam-client/passwordPolicy";
 import PasswordChecklist from '../ui/PasswordChecklist'
+import { useState } from "react";
+import { signup } from "../iam-client/tenants";
+import { notifications } from "@mantine/notifications";
+import { ApiError } from "../iam-client/ApiError";
 
 const signupSchema = z.object({
     tenantName: z.string().trim().min(1, 'Organization name is required'),
@@ -22,17 +26,37 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>
 
 function SignupPage() {
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
     const {
         register,
         handleSubmit,
         control,
-        formState: { errors }
+        formState: { errors, isSubmitting }
     } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema) })
 
-    const password = useWatch({ control, name: 'password'}) ?? '' // empty before the first keystroke
+    const password = useWatch({ control, name: 'password' }) ?? '' // empty before the first keystroke
 
-    const onSubmit = (values: SignupFormValues) => {
-        console.log(values)
+    const onSubmit = async (values: SignupFormValues) => {
+        setErrorMessage(null)
+
+        try {
+            const result = await signup({
+                tenantName: values.tenantName,
+                rootUser: {
+                    username: values.username,
+                    password: values.password,
+                    fullName: values.fullName || undefined,
+                    email: values.email
+                }
+            })
+            console.log(result)
+            notifications.show({ color: 'green', message: `${result.tenant.name} is ready` })
+        } catch (error) {
+            if (error instanceof ApiError) {
+                setErrorMessage(error.message)
+            }
+        }
     }
 
     return (
@@ -77,7 +101,14 @@ function SignupPage() {
                         {...register('confirmPassword')}
                     />
 
-                    <Button type="submit">Create organization</Button>
+                    {errorMessage && (
+                        <Alert color="red" variant="light">
+                            {errorMessage}
+                        </Alert>
+                    )}
+                    <Button type="submit" loading={isSubmitting}>
+                        Create organization
+                    </Button>
                     <Text size="sm">
                         Already have one? {' '}
                         <Anchor component={Link} to="/login">
