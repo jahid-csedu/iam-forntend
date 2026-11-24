@@ -25,6 +25,24 @@ const signupSchema = z.object({
 
 type SignupFormValues = z.infer<typeof signupSchema>
 
+// 422: the backend's field names (its nested API shape) → our form's field names
+const apiFieldToFormField: Record<string, keyof SignupFormValues> = {
+    tenantName: 'tenantName',
+    'rootUser.username': 'username',
+    'rootUser.fullName': 'fullName',
+    'rootUser.email': 'email',
+    'rootUser.password': 'password',
+}
+
+// 409 / 400: the message tells us the field (README step 5 error table)
+function fieldForMessage(message: string): keyof SignupFormValues | null {
+    if (message === 'Tenant name not available') return 'tenantName'
+    if (message === 'Username not available') return 'username'
+    if (message === 'Email not available') return 'email'
+    if (message.startsWith('Password must')) return 'password' // the policy message (400)
+    return null
+}
+
 function SignupPage() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -32,6 +50,8 @@ function SignupPage() {
         register,
         handleSubmit,
         control,
+        setError,
+        resetField,
         formState: { errors, isSubmitting }
     } = useForm<SignupFormValues>({ resolver: zodResolver(signupSchema) })
 
@@ -54,7 +74,30 @@ function SignupPage() {
             notifications.show({ color: 'green', message: `${result.tenant.name} is ready` })
         } catch (error) {
             if (error instanceof ApiError) {
-                setErrorMessage(error.message)
+                resetField('password')
+                resetField('confirmPassword')
+                let placed = false // did we find a field for it?
+
+                // 422: one message per field
+                for (const [apiField, message] of Object.entries(error.fieldErrors)) {
+                    const field = apiFieldToFormField[apiField]
+                    if (field) {
+                        setError(field, { message })
+                        placed = true
+                    }
+                }
+
+                // 409 / 400: the message itself tells us the field
+                const field = fieldForMessage(error.message)
+                if (field) {
+                    setError(field, { message: error.message })
+                    placed = true
+                }
+
+                // Anything else (e.g. server down): the box above the button
+                if (!placed) {
+                    setErrorMessage(error.message)
+                }
             }
         }
     }
