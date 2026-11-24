@@ -8,6 +8,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import LoginPage from './pages/LoginPage'
 import UserDetailPage from './pages/UserDetailPage'
 import SignupPage from './pages/SignupPage'
+import SignupDonePage from './pages/SignupDonePage'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<LoginPage key="login" />} />
         <Route path="/login/:clientId" element={<LoginPage key="login-with-id" />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/signup/done" element={<SignupDonePage />} />
       </Route>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 

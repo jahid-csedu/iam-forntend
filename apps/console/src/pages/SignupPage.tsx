@@ -1,5 +1,5 @@
 import { Alert, Anchor, Button, Container, PasswordInput, Stack, Text, TextInput, Title } from "@mantine/core";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,7 +7,6 @@ import { PASSWORD_POLICY, PASSWORD_POLICY_MESSAGE } from "../iam-client/password
 import PasswordChecklist from '../ui/PasswordChecklist'
 import { useState } from "react";
 import { signup } from "../iam-client/tenants";
-import { notifications } from "@mantine/notifications";
 import { ApiError } from "../iam-client/ApiError";
 
 const signupSchema = z.object({
@@ -45,6 +44,7 @@ function fieldForMessage(message: string): keyof SignupFormValues | null {
 
 function SignupPage() {
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const navigate = useNavigate()
 
     const {
         register,
@@ -70,8 +70,7 @@ function SignupPage() {
                     email: values.email
                 }
             })
-            console.log(result)
-            notifications.show({ color: 'green', message: `${result.tenant.name} is ready` })
+            navigate('/signup/done', { state: result })
         } catch (error) {
             if (error instanceof ApiError) {
                 resetField('password')
