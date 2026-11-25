@@ -1,6 +1,7 @@
-import { Button, Code, Container, CopyButton, Group, Stack, Text, Title } from '@mantine/core'
+import { Button, Container, Stack, Text, Title } from '@mantine/core'
 import { Link, useLocation } from 'react-router'
 import type { SignupResponse } from '../iam-client/tenants'
+import CopyButtonWithText from '../ui/CopyButtonWithText'
 
 function SignupDonePage() {
   // The signup result, handed over by navigate() on the signup page
@@ -27,28 +28,10 @@ function SignupDonePage() {
 
       <Stack mt="md">
         <Text>Your console login link (bookmark it):</Text>
-        <Group>
-          <Code>{loginLink}</Code>
-          <CopyButton value={loginLink}>
-            {({ copied, copy }) => (
-              <Button size="xs" variant="light" onClick={copy}>
-                {copied ? 'Copied' : 'Copy'}
-              </Button>
-            )}
-          </CopyButton>
-        </Group>
+        <CopyButtonWithText value={loginLink} />
 
         <Text>Your Console ID:</Text>
-        <Group>
-            <Code>{ clientId }</Code>
-            <CopyButton value={clientId}>
-            {({ copied, copy }) => (
-              <Button size="xs" variant="light" onClick={copy}>
-                {copied ? 'Copied' : 'Copy'}
-              </Button>
-            )}
-          </CopyButton>
-        </Group>
+        <CopyButtonWithText value={result.managementConsole.client_id} />
 
         <Text>Username: {result.rootUser.username}</Text>
 
